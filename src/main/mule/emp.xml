@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="48e3bb92-c0a2-442b-a905-512180620bbe" >
+		<db:my-sql-connection host="database-2.cnac4rdav8o1.eu-north-1.rds.amazonaws.com" port="3306" user="admin" password="EVILRIDER0803" database="customer_db" />
+	</db:config>
+	<http:listener-config name="HTTP_Listener_config1" doc:name="HTTP Listener config" doc:id="ed653bf3-9964-497a-9a39-f0026505ea1a" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<api-gateway:autodiscovery apiId="19129457" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="8e651a86-4002-4899-aeff-65af54e56e97" flowRef="empFlow" />
+	<flow name="empFlow" doc:id="ed3a78e6-e850-4dc0-8ad2-ec6a9fcea300" >
+		<http:listener doc:name="Listener" doc:id="99233753-fdd0-4c8f-b0a2-3486b5cb4d6e" config-ref="HTTP_Listener_config1" path="/emp"/>
+		<logger level="INFO" doc:name="Start Logger" doc:id="ea52d33a-0005-4ce3-a27c-2392af892a53" message="delete Employee Start Logger"/>
+		<db:select doc:name="Select" doc:id="743ddee2-8213-4bd5-bd05-37154155c74c" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from customer_db.emp_tbl where id=:id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	id:attributes.queryParams.id
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="2f3d4828-fcd0-4e8d-b3fb-87b7ea09f173" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="End Logger" doc:id="2fb5e463-8501-4fa5-89fb-a7238cc1f612" message='#["delete Stored procedure Completed"]'/>
+	</flow>
+</mule>
