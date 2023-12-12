@@ -32,5 +32,15 @@ payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="End Logger" doc:id="2fb5e463-8501-4fa5-89fb-a7238cc1f612" message='#["delete Stored procedure Completed"]'/>
+		<ee:transform doc:name="Transform Message" doc:id="45664d3e-943f-498f-bf8e-1a5caa7e04fc" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"data":"application working "
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</flow>
 </mule>
